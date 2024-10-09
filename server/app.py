@@ -21,7 +21,60 @@ def index():
     return make_response(body, 200)
 
 # Add views here
+#add a view that takes one parameter, an integer that represents an id. The route should have the form /earthquakes/<int:id>.
+@app.route('/earthquakes/<int:id>')
+def get_by_id(id):
+    #check for id
+    earthquake = Earthquake.query.filter(Earthquake.id == id).first()
+    #if it exists return it as an object body
+    if earthquake:
+        body = {'id': earthquake.id,
+            'magnitude': earthquake.magnitude,
+            'location': earthquake.location,
+            'year': earthquake.year
+            }
+        status = 200
+    # if not, return an error message body    
+    else:
+        body = {'message': f'Earthquake {id} not found.'}
+        status = 404
+    #return the respons body
+    return make_response(body, status)
+
+
+# /earthquakes/magnitude/<float:magnitude>.
+@app.route('/earthquakes/magnitude/<float:magnitude>')
+#takes one parameter, a float that represents magnitude.
+def earthquake_magnitude(magnitude):
+ # The view should query the database to get all earthquakes having a magnitude greater than or equal to the parameter value
+    earthquakes = Earthquake.query.filter(Earthquake.magnitude >= magnitude).all()
+
+    magnitudes = []
+    for earthquake in earthquakes:
+        magnitude_dict = {
+            'id': earthquake.id,
+            'location': earthquake.location,
+            'magnitude': earthquake.magnitude,
+            "year": earthquake.year
+        }
+        magnitudes.append(magnitude_dict) 
+    
+    
+    
+    body = {'count': len(magnitudes),
+            'quakes': magnitudes
+        }
+    status = 200
+    
+    return make_response(body, status)
+
+ 
+
+# , and return a JSON response containing the count of matching rows along with a list containing the data for each row.
+
+
+
 
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5554, debug=True)
